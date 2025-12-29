@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 1,1,1;
+  --foreground: 229,229,231;
+  --muted: 18,18,18;
+  --muted-foreground: 160,160,166; /* ~#A0A0A6 */
+  --border: 39,39,41;
+}
