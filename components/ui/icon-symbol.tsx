@@ -21,7 +21,8 @@ const MAPPING = {
   'music.pages.fill': 'library-music',
   'magnifyingglass': 'search',
   'person' : 'person',
-  'gear' : 'settings'
+  'gear' : 'settings',
+  'ellipsis' : 'more-horiz'
 } as IconMapping;
 
 /**
