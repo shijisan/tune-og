@@ -22,7 +22,7 @@ const MAPPING = {
   'magnifyingglass': 'search',
   'person' : 'person',
   'gear' : 'settings',
-  'ellipsis' : 'more-horiz'
+  'ellipsis' : 'more-horiz',
 } as IconMapping;
 
 /**
