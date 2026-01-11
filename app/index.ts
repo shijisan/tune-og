@@ -1,2 +1,3 @@
-import "@/lib/pollfills";
+import "@/lib/pollyfills";
 import 'expo-router/entry';
+

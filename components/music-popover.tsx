@@ -1,11 +1,10 @@
+import { MusicSearchResult } from '@/app/(tabs)';
+import { useMusic } from '@/context/MusicContext';
+import { getDownload, getStreamingUrl, searchYouTubeMusic } from '@/lib/youtube';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { Audio } from 'expo-av';
 import { Pressable, Text, View } from 'react-native';
 import Popover from 'react-native-popover-view';
-import { MusicSearchResult } from '@/app/(tabs)';
-import { Audio } from 'expo-av';
-import { useMusic } from '@/context/MusicContext';
-import { searchYouTubeMusic, getStreamingUrl } from '@/lib/youtube';
-import { getDownload } from '@/lib/youtube';
 
 interface MusicPopoverProps {
     openPopoverId: number | null;
@@ -21,7 +20,6 @@ export default function MusicPopover({ openPopoverId, item, setOpenPopoverId }: 
         setIsPlaying,
         durationMillis,
         setDurationMillis,
-        positionMillis,
         setPositionMillis
     } = useMusic();
 
@@ -29,7 +27,6 @@ async function getTrackId(title: string, artist: string): Promise<string | null>
     try {
         setCurrProcess("Searching music…");
         
-        // Pass both title and artist separately (don't combine them)
         const result = await searchYouTubeMusic(title, artist);
 
         if (!result?.videoId) {
@@ -63,7 +60,6 @@ async function getTrackId(title: string, artist: string): Promise<string | null>
             setCurrProcess("Loading audio…");
             await handleSoundInstance(streamData.url);
 
-            // Success: clear status
             setCurrProcess(null);
         } catch (err: any) {
             console.error('Playback error:', err.message);

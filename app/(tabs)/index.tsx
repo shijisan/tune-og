@@ -1,14 +1,13 @@
-import Searchbar from '@/components/searchbar';
-import { useEffect, useState } from 'react';
-import { FlatList, Keyboard, Pressable, Text, View } from 'react-native';
-import { Image } from 'react-native';
-import MusicPopover from '@/components/music-popover';
-import 'react-native-url-polyfill/auto';
-import 'react-native-get-random-values';
-import { TextEncoder, TextDecoder } from 'text-encoding';
-import { Buffer } from 'buffer';
 import { PersistentMiniPlayer } from '@/components/music-player';
+import MusicPopover from '@/components/music-popover';
+import Searchbar from '@/components/searchbar';
 import { preInitializeYouTubeClients } from '@/lib/youtube';
+import { Buffer } from 'buffer';
+import { useEffect, useState } from 'react';
+import { FlatList, Image, Keyboard, Pressable, Text, View } from 'react-native';
+import 'react-native-get-random-values';
+import 'react-native-url-polyfill/auto';
+import { TextDecoder, TextEncoder } from 'text-encoding';
 
 if (typeof global.TextEncoder === 'undefined') {
   global.TextEncoder = TextEncoder;
@@ -39,9 +38,20 @@ export default function Discover() {
   const [results, setResults] = useState<MusicSearchResult[]>([]);
   const [isFocused, setIsFocused] = useState(false);
   const [openPopoverId, setOpenPopoverId] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
 
-    useEffect(() => {
-    preInitializeYouTubeClients();
+  useEffect(() => {
+    if (mounted) return;
+
+    const init = async () => {
+      await new Promise(requestAnimationFrame);
+      setTimeout(() => {
+        preInitializeYouTubeClients();
+        setMounted(true);
+      }, 0);
+    };
+
+    init();
   }, []);
 
   return (
@@ -82,7 +92,7 @@ export default function Discover() {
               )}
             </View>
           )}
-          <Searchbar customPath='https://itunes.apple.com/search?term=${encodeURIComponent(keyword)}' method='GET' setResults={setResults} setIsFocused={setIsFocused} isFocused={isFocused} />
+          <Searchbar customPath='https://itunes.apple.com/search' method='GET' setResults={setResults} setIsFocused={setIsFocused} isFocused={isFocused} mounted={mounted} />
           
         </View>          
         <PersistentMiniPlayer />

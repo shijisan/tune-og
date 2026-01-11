@@ -1,8 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pressable, TextInput, View } from "react-native";
-import { API_URL, API_PROTOCOL } from "@env";
 
 interface SearchbarProps {
   customPath?: string;
@@ -12,27 +11,29 @@ interface SearchbarProps {
   setResults: (results: any[]) => void;
   isFocused: boolean;
   setIsFocused: React.Dispatch<React.SetStateAction<boolean>>;
+  mounted: boolean;
 }
 
-export default function Searchbar({ path, customPath, buildUrl, method = "POST", setResults, isFocused, setIsFocused }: SearchbarProps) {
+export default function Searchbar({ path, customPath, buildUrl, method = "POST", setResults, isFocused, setIsFocused, mounted }: SearchbarProps) {
   const [query, setQuery] = useState<string>("");
   const inputRef = useRef<TextInput>(null);
+  const inputTextRef = useRef("");
   const router = useRouter();
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const finalUrl = buildUrl
-    ? buildUrl(query.trim())
-    : customPath
-      ? `${customPath}${customPath.includes('?') ? '&' : '?'}${new URLSearchParams({
-        term: query.trim(),
-        limit: "20",
-        media: "music"
-      }).toString()}`
-      : `${API_PROTOCOL}://${API_URL}/api/${path}`;
+
+  function getFinalUrl(keyword: string) {
+    return customPath ? `${customPath}?${new URLSearchParams({
+      term: keyword.trim(),
+      limit: "20",
+      media: "music"
+    }).toString()}` :
+      "this is the alt ver"
+  }
 
   async function fetchResults(keyword: string) {
     if (!keyword.trim()) return;
-
+    const finalUrl = getFinalUrl(keyword);
     const isExternal = !!customPath || !!buildUrl;
 
     const options: RequestInit = {
@@ -54,15 +55,25 @@ export default function Searchbar({ path, customPath, buildUrl, method = "POST",
     }
   }
 
-  function handleChange(text: string) {
-    setQuery(text);
-
+  function scheduleFetch(text: string) {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
     timeoutRef.current = setTimeout(() => {
       if (text.length > 0) fetchResults(text);
-    }, 750);
+    });
   }
+
+  function handleChange(text: string) {
+    inputTextRef.current = text;
+    setQuery(text);
+    scheduleFetch(text);
+  }
+
+  useEffect(() => {
+    if (!mounted) return;
+    const text = inputTextRef.current;
+    if (text.length > 0) handleChange(text);
+  }, [mounted]);
 
   return (
     <View className="z-10 py-2">
@@ -75,8 +86,9 @@ export default function Searchbar({ path, customPath, buildUrl, method = "POST",
             className={`py-2 px-8 rounded-full bg-muted text-foreground w-full border ${isFocused ? "border-foreground" : "border-transparent"}`}
             onChangeText={handleChange}
             value={query}
-            onFocus={(e) => {e.stopPropagation();setIsFocused(true)}}
+            onFocus={(e) => { e.stopPropagation(); setIsFocused(true) }}
             onBlur={() => setIsFocused(false)}
+            editable={mounted}
           />
 
           {!isFocused && query === "" && (
