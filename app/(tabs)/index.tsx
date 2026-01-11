@@ -1,9 +1,6 @@
-import { PersistentMiniPlayer } from '@/components/music-player';
 import MusicPopover from '@/components/music-popover';
-import Searchbar from '@/components/searchbar';
-import { preInitializeYouTubeClients } from '@/lib/youtube';
+import { useMusic } from '@/context/MusicContext';
 import { Buffer } from 'buffer';
-import { useEffect, useState } from 'react';
 import { FlatList, Image, Keyboard, Pressable, Text, View } from 'react-native';
 import 'react-native-get-random-values';
 import 'react-native-url-polyfill/auto';
@@ -35,24 +32,7 @@ export interface MusicSearchResult {
 
 export default function Discover() {
 
-  const [results, setResults] = useState<MusicSearchResult[]>([]);
-  const [isFocused, setIsFocused] = useState(false);
-  const [openPopoverId, setOpenPopoverId] = useState<number | null>(null);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    if (mounted) return;
-
-    const init = async () => {
-      await new Promise(requestAnimationFrame);
-      setTimeout(() => {
-        preInitializeYouTubeClients();
-        setMounted(true);
-      }, 0);
-    };
-
-    init();
-  }, []);
+  const {results, isFocused, openPopoverId, setOpenPopoverId} = useMusic();
 
   return (
     <View className="flex-1 w-full mt-16">
@@ -92,10 +72,9 @@ export default function Discover() {
               )}
             </View>
           )}
-          <Searchbar customPath='https://itunes.apple.com/search' method='GET' setResults={setResults} setIsFocused={setIsFocused} isFocused={isFocused} mounted={mounted} />
           
         </View>          
-        <PersistentMiniPlayer />
+        
       </Pressable>
     </View>
   );

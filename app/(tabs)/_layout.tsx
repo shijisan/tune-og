@@ -1,25 +1,39 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-
-import { HapticTab } from '@/components/haptic-tab';
+import { CustomTabBar } from '@/components/bottom-tab-bar';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
+import { useMusic } from '@/context/MusicContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { preInitializeYouTubeClients } from '@/lib/youtube';
+import { Tabs } from 'expo-router';
+import { useEffect } from 'react';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+    const { mounted, setMounted } = useMusic();
+
+  
+    useEffect(() => {
+      if (mounted) return;
+  
+      const init = async () => {
+        await new Promise(requestAnimationFrame);
+        setTimeout(() => {
+          preInitializeYouTubeClients();
+          setMounted(true);
+        }, 0);
+      };
+  
+      init();
+    }, []);
 
   return (
     <>
-      
 
       <Tabs
         screenOptions={{
-          tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
           headerShown: false,
-          tabBarButton: HapticTab,
-          tabBarPosition: "bottom"
-        }}>
+        }}
+        tabBar={(props) => <CustomTabBar {...props} />}
+        >
 
         <Tabs.Screen
           name="index"

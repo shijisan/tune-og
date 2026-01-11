@@ -1,50 +1,21 @@
-# Welcome to your Expo app 👋
+React Native
+Youtubei.js (Innertube)
+Apple music search (for now)
+Nativewind
+React Native Track Player
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Phase 1:
+- Streaming, Downloading, Background Playback
 
-## Get started
+Phase 1.1:
+- SQLite Playlists, Queueing
 
-1. Install dependencies
+Phase 1.2:
+- Spotify Library Import, Optional auth for cloud sync
 
-   ```bash
-   npm install
-   ```
+Phase 2:
+- Playlist publishing, playlist ratings, playlist collabs
 
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Note:
+- When building locally,device name cannot be spaced (ex: "test 123") otherwise C/C++ compiling will break.
+- use symlink to workaround error mentioned.

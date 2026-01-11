@@ -1,14 +1,29 @@
-import { useCallback, useEffect, useState } from "react";
-import { View, Text, FlatList, Pressable } from "react-native";
-import { Paths, Directory, File } from "expo-file-system";
-import { Audio } from "expo-av";
-import { PersistentMiniPlayer } from "@/components/music-player";
+import MusicPopover from '@/components/music-popover';
+import { useMusic } from '@/context/MusicContext';
 import { useFocusEffect } from '@react-navigation/native';
+import { Audio } from 'expo-av';
+import { Directory, File, Paths } from "expo-file-system";
+import { useCallback, useEffect, useState } from "react";
+import { FlatList, Keyboard, Pressable, Text, View } from "react-native";
 
 export default function LibraryScreen() {
     const [files, setFiles] = useState<File[]>([]);
-    const [sound, setSound] = useState<Audio.Sound | null>(null);
     const [playingFile, setPlayingFile] = useState<string | null>(null);
+    const {
+        playing, 
+        setPlaying, 
+        setOpenPopoverId, 
+        openPopoverId,
+        setIsPlaying,
+        setDurationMillis,
+        setPositionMillis,
+        durationMillis
+    } = useMusic();
+
+    function resetProgress() {
+        setPositionMillis(null);
+        setDurationMillis(null);
+    }
 
     async function loadFiles() {
         try {
@@ -24,37 +39,64 @@ export default function LibraryScreen() {
 
     useEffect(() => {
         return () => {
-            if (sound) {
-                sound.unloadAsync();
+            if (playing) {
+                playing.unloadAsync();
             }
         };
-    }, [sound]);
+    }, [playing]);
 
     async function handlePlay(file: File) {
+        setOpenPopoverId("");
         try {
-            if (sound) {
-                await sound.stopAsync();
-                await sound.unloadAsync();
-                setSound(null);
+            if (playing) {
+                await playing.stopAsync();
+                await playing.unloadAsync();
+                setPlaying(null);
             }
+
+            resetProgress();
+
             const { sound: newSound } = await Audio.Sound.createAsync(
                 { uri: file.uri },
                 { shouldPlay: true }
             );
-            setSound(newSound);
-            setPlayingFile(file.uri);
+
+            const status = await newSound.getStatusAsync();
+            if (status.isLoaded) {
+                setDurationMillis(status.durationMillis ?? null);
+            }
+
+            newSound.setOnPlaybackStatusUpdate((status) => {
+                if (status.isLoaded) {
+                    setPositionMillis(status.positionMillis ?? null);
+                    if (status.durationMillis && durationMillis !== status.durationMillis) {
+                        setDurationMillis(status.durationMillis);
+                    }
+                    if (status.didJustFinish && !status.isLooping) {
+                        setIsPlaying(false);
+                        setPlaying(null);
+                        resetProgress();
+                    }
+                }
+            });
+
+            setPlaying(newSound);
+            setIsPlaying(true);
+            if (setPlayingFile) setPlayingFile(file.uri);
         } catch (err) {
             console.error("Error playing audio:", err);
+            resetProgress();
         }
     }
 
     async function handleDelete(file: File) {
         try {
-            if (sound && playingFile === file.uri) {
-                await sound.stopAsync();
-                await sound.unloadAsync();
-                setSound(null);
+            if (playing && playingFile === file.uri) {
+                await playing.stopAsync();
+                await playing.unloadAsync();
+                setPlaying(null);
                 setPlayingFile(null);
+                resetProgress();
             }
             await file.delete();
             setFiles((prev) => prev.filter(f => f.uri !== file.uri));
@@ -71,33 +113,31 @@ export default function LibraryScreen() {
 
     return (
         <View className="flex-1 bg-background mt-16">
-            <View className="px-4">
+            <View className="gap-6 p-4">
                 <Text className="text-foreground">Downloaded Files</Text>
-                {files.length === 0 && <Text className="text-muted">No downloads yet</Text>}
+                <View className='px-4'>
+                    {files.length === 0 && <Text className="text-muted">No downloads yet</Text>}
+                    <FlatList
+                        className='gap-3'
+                        onTouchMove={Keyboard.dismiss}
+                        data={files}
+                        keyExtractor={item => item.uri}
+                        renderItem={({ item }) => (
+                        <Pressable 
+                            className="flex-row items-center justify-between p-2" 
+                            onPress={() => handlePlay(item)}
+                        >
+                            <View className="flex-1">
+                            <Text className='text-foreground text-base' numberOfLines={1}>{item.name}</Text>
+                            </View>
+                            <MusicPopover item={item} openPopoverId={openPopoverId} setOpenPopoverId={setOpenPopoverId} setPlayingFile={setPlayingFile} playingFile={playingFile} handlePlay={handlePlay} handleDelete={handleDelete} />
+                        </Pressable>
+                        )}
+                        ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+                    />
+                </View>
             </View>
-                <FlatList
-                className="flex-1 p-4"
-                    data={files}
-                    keyExtractor={(item) => item.uri}
-                    renderItem={({ item }) => (
-                        <View className="flex-row items-center justify-between mb-4 bg-muted-foreground/10 p-2 rounded">
-                            <Pressable
-                                className={`flex-1 ${playingFile === item.uri ? 'bg-green-600 p-2 rounded' : ''}`}
-                                onPress={() => handlePlay(item)}
-                            >
-                                <Text className="text-foreground">{item.name}</Text>
-                            </Pressable>
-                            <Pressable
-                                className="ml-2 p-2 bg-red-600 rounded"
-                                onPress={() => handleDelete(item)}
-                            >
-                                <Text className="text-white">Delete</Text>
-                            </Pressable>
-                        </View>
-                    )}
-                />
-
-                <PersistentMiniPlayer />
+                
             
         </View>
     );
