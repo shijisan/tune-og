@@ -32,7 +32,7 @@ export interface MusicSearchResult {
 
 export default function Discover() {
 
-  const {results, isFocused, openPopoverId, setOpenPopoverId} = useMusic();
+  const {results, isFocused, openPopoverId, setOpenPopoverId, handleTrackStream} = useMusic();
 
   return (
     <View className="flex-1 w-full mt-16">
@@ -48,7 +48,7 @@ export default function Discover() {
               data={results}
               keyExtractor={item => item.trackId.toString()}
               renderItem={({ item }) => (
-                <View className="flex-row items-center gap-3">
+                <Pressable onPress={() => handleTrackStream(item.trackName, item.artistName)} className="flex-row items-center gap-3 active:bg-neutral-800">
                   <Image
                     source={{ uri: item.artworkUrl60 || item.artworkUrl100 }}
                     style={{ width: 50, height: 50 }}
@@ -58,7 +58,7 @@ export default function Discover() {
                     <Text className='text-foreground text-xs' numberOfLines={1}>{item.artistName}</Text>
                   </View>
                   <MusicPopover item={item} openPopoverId={openPopoverId} setOpenPopoverId={setOpenPopoverId} />
-                </View>
+                </Pressable>
               )}
               ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
             />

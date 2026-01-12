@@ -14,8 +14,10 @@
 
 ### Phase 1.1
 - [x] Improved audio source selection   
+- [ ] Add loading state to avoid startup lag
 - [ ] SQLite playlists
 - [ ] Queueing
+- [ ] Apk release version 1.0.0
 
 ### Phase 1.2
 - [ ] Spotify library import
