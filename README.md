@@ -1,21 +1,32 @@
-React Native
-Youtubei.js (Innertube)
-Apple music search (for now)
-Nativewind
-React Native Track Player
+## Tech Stack
+- React Native
+- Youtubei.js (Innertube)
+- Apple Music Search (temporary)
+- NativeWind
+- React Native Track Player
 
-Phase 1:
-- Streaming, Downloading, Background Playback
+## Roadmap
 
-Phase 1.1:
-- SQLite Playlists, Queueing
+### Phase 1
+- [x] Streaming
+- [x] Downloading
+- [x] Background playback
 
-Phase 1.2:
-- Spotify Library Import, Optional auth for cloud sync
+### Phase 1.1
+- [x] Improved audio source selection   
+- [ ] SQLite playlists
+- [ ] Queueing
 
-Phase 2:
-- Playlist publishing, playlist ratings, playlist collabs
+### Phase 1.2
+- [ ] Spotify library import
+- [ ] Optional auth for cloud sync
 
-Note:
-- When building locally,device name cannot be spaced (ex: "test 123") otherwise C/C++ compiling will break.
-- use symlink to workaround error mentioned.
+### Phase 2
+- [ ] Playlist publishing
+- [ ] Playlist ratings
+- [ ] Collaborative playlists
+
+## Notes
+- When building locally, **device name must not contain spaces**  
+  (e.g. `"test 123"` breaks C/C++ compilation)
+- Use a **symlink** as a workaround for the above issue
